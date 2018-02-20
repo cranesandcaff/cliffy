@@ -28,65 +28,68 @@ This is what allows Cliffy to parse negatives.
 **Installation**:
 
 ```bash
-npm i cliffy # --save if using npm < v5
+npm i cliffy -S # --save if using npm < v5
+```
+
+or
+
+```bash
+yarn add cliffy # --save if using npm < v5
 ```
 
 **Usage**
 
 ```typescript
-import { CLI } from "cliffy";
+import { CLI } from 'cliffy';
 
-const cli = new CLI();
-
-cli.setDelimiter("run command ->");
-
-cli.command("say", {
-    description: "Say a word",
-    options: ["reversed"],
-    parameters: [{ label: "word", type: "string" }],
+new CLI()
+  .setDelimiter('run command ->')
+  .addCommand('say', {
+    description: 'Say a word',
+    options: ['reversed'],
+    parameters: [{ label: 'word', type: 'string' }],
     action: (params, options, done) => {
-        if (options.reversed) {
-            console.log(params.word.split("").reverse().join());
-        } else {
-            console.log(params.word)
-        }
-        done()
-    }
-});
-
-cli.command("run", {
-    description: "Run somewhere",
+      if (options.reversed) {
+        console.log(params.word.split('').reverse().join());
+      } else {
+        console.log(params.word);
+      }
+      done();
+    },
+  })
+  .addCommand('run', {
+    description: 'Run somewhere',
     options: [
-        { option: "fast", description: "Run fast" },
-        { option: "medium", description: "Run medium fast" },
-        { option: "slow", description: "Run slow" }
+      { option: 'fast', description: 'Run fast' },
+      { option: 'medium', description: 'Run medium fast' },
+      { option: 'slow', description: 'Run slow' },
     ],
-    parameters: [{ label: "destination" }],
+    parameters: [{ label: 'destination' }],
     action: (params, options, done) => {
-        console.log(`I ran to ${params.destination}`);
-        done();
+      console.log(`I ran to ${params.destination}`);
+      done();
     },
     subcommands: {
-        to: {
-            description: "Run to a destination",
-            parameters: [{ label: "destination" }],
-            action: (params, options, done) => {
-                console.log(`I ran to ${params.destination}`);
-                done();
-            },
-        }
+      to: {
+        description: 'Run to a destination',
+        parameters: [{ label: 'destination' }],
+        action: (params, options, done) => {
+          console.log(`I ran to ${params.destination}`);
+          done();
+        },
+      }
         from: {
-            description: "Run from a destination",
-            parameters: [{ label: "destination" }],
-            action: (params, options, done) => {
-                console.log(`I ran to ${params.destination}`);
-                done();
-            },
-        }
-    }
-});
+        description: 'Run from a destination',
+        parameters: [{ label: 'destination' }],
+        action: (params, options, done) => {
+          console.log(`I ran to ${params.destination}`);
+          done();
+        },
+      },
+    },
+  })
+  .show();
 
-cli.show();
 ```
 
 Result:
@@ -145,7 +148,7 @@ Usage:
 const cli = new CLI(opts)
 ```
 
-### `cli.command(name: string, opts: Command): void`
+### `cli.addCommand(name: string, opts: Command): void`
 
 Register a command
 
@@ -155,7 +158,7 @@ The command name is what the user will enter to execute the command.
 
 The command opts follows the following interface:
 ```typescript
-interface Command {
+interface ICommand {
     /**
      * Required action function. Executed when the user enters the command.
      *
@@ -169,7 +172,7 @@ interface Command {
      * As an alternative to calling done, the action may also return a Promise which ends the
      * action when resolved.
      */
-    action: (parameters: any, options: any, done: () => void) => void | Promise<any>;
+    action: (parameters: IActionData, options: IActionData) => void | Promise<any>;
 
     /** Optional description for documentation */
     description?: string;
@@ -184,20 +187,24 @@ interface Command {
     parameters?: Parameter[],
 
     /** Sub commands of the command. Follows the same interface as Command */
-    subcommands?: { [command: string]: Command },
+    subcommands?: { [command: string]: ICommand },
 }
 
-interface Parameter {
+interface IParameter {
     label: string;
     type?: "boolean" | "number" | "string";
     description?: string;
+}
+
+interface IActionData {
+  [parametr: string]: boolean | number | string;
 }
 ```
 
 Example Usage:
 
 ```typescript
-cli.command("run", {
+cli.addCommand("run", {
     description: "Run somewhere",
     options: [
         { option: "fast", description: "Run fast" },

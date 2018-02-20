@@ -1,4 +1,4 @@
-import { Command } from "./definitions";
+import { ICommand } from './definitions';
 
 /**
  * Returns an object with any options that were in the command set to true,
@@ -7,62 +7,63 @@ import { Command } from "./definitions";
  * Returns false if an invalid option was detected
  * @param commandPieces
  */
-export function parseOptions(command: Command, commandPieces: string[]): { options: any, remainingPieces: string[] } | false {
-    const options: any = {};
+export function parseOptions(command: ICommand,
+                             commandPieces: string[]): { options: any, remainingPieces: string[] } | false {
+  const options: any = {};
 
-    const { foundOptions, remainingPieces } = removeOptionsFromCommandPieces(commandPieces);
+  const { foundOptions, remainingPieces } = removeOptionsFromCommandPieces(commandPieces);
 
-    // Options were found when no options were registered
-    if (!command.options && foundOptions.length > 0) return false;
+  // Options were found when no options were registered
+  if (!command.options && foundOptions.length > 0) return false;
 
-    // Options are empty
-    if (!command.options) return { options, remainingPieces: commandPieces };
+  // Options are empty
+  if (!command.options) return { options, remainingPieces: commandPieces };
 
-    populateOptionsObject(command, options);
+  populateOptionsObject(command, options);
 
-    let hadInvalidOption = matchOptionsUsedInCommandStr(foundOptions, options);
+  const hadInvalidOption = matchOptionsUsedInCommandStr(foundOptions, options);
 
-    if (hadInvalidOption) return false;
+  if (hadInvalidOption) return false;
 
-    return { options, remainingPieces };
+  return { options, remainingPieces };
 }
 
 function matchOptionsUsedInCommandStr(foundOptions: string[], options: any) {
-    let hadInvalidOption = false;
-    foundOptions.forEach(opt => {
-        // Make sure the options is registered with the command before we set it
-        if (options[opt] === undefined) {
-            hadInvalidOption = true;
-        }
+  let hadInvalidOption = false;
+  foundOptions.forEach((opt) => {
+    // Make sure the options is registered with the command before we set it
+    if (options[opt] === undefined) {
+      hadInvalidOption = true;
+    }
 
-        options[opt] = true;
-    });
-    return hadInvalidOption;
+    options[opt] = true;
+  });
+  return hadInvalidOption;
 }
 
-function populateOptionsObject(command: Command, options: any) {
-    if (!command.options) throw new Error("No options to populate")
-    command.options.forEach(opt => {
-        if (typeof opt === "string") {
-            options[opt] = false;
-            return;
-        }
-        options[opt.option] = false;
-    });
+function populateOptionsObject(command: ICommand, options: any) {
+  if (!command.options) throw new Error('No options to populate');
+  command.options.forEach((opt) => {
+    if (typeof opt === 'string') {
+      options[opt] = false;
+      return;
+    }
+    options[opt.option] = false;
+  });
 }
 
 function removeOptionsFromCommandPieces(commandPieces: string[]) {
-    let remainingPieces = commandPieces.slice();
-    const foundOptions: string[] = [];
-    commandPieces.forEach(piece => {
-        if (piece[0] === "@") {
-            foundOptions.push(piece.substring(1));
-        }
-    });
-    // Remove options from the commandPieces
-    foundOptions.forEach(opt => {
-        const index = remainingPieces.indexOf(`@${opt}`);
-        remainingPieces.splice(index, 1);
-    });
-    return { foundOptions, remainingPieces };
+  const remainingPieces = commandPieces.slice();
+  const foundOptions: string[] = [];
+  commandPieces.forEach((piece) => {
+    if (piece[0] === '@') {
+      foundOptions.push(piece.substring(1));
+    }
+  });
+  // Remove options from the commandPieces
+  foundOptions.forEach((opt) => {
+    const index = remainingPieces.indexOf(`@${opt}`);
+    remainingPieces.splice(index, 1);
+  });
+  return { foundOptions, remainingPieces };
 }

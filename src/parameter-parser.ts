@@ -1,5 +1,4 @@
-import { Command } from "./definitions";
-
+import { ICommand } from './definitions';
 
 /**
  * Get the parameters object from the remainingPieces of the command string.
@@ -9,23 +8,23 @@ import { Command } from "./definitions";
  * @param command
  * @param commandPieces
  */
-export function parseParameters(command: Command, commandPieces: string[]): any | false {
-    if (!command.parameters && (commandPieces.length > 0)) return false;
-    if (!command.parameters) return {};
-    if (command.parameters.length !== commandPieces.length) return false;
-    const params: any = {};
-    command.parameters.forEach(param => {
-        if (!param.type || param.type === "string") {
-            params[param.label] = commandPieces.shift();
-            return;
-        }
+export function parseParameters(command: ICommand, commandPieces: string[]): any | false {
+  if (!command.parameters && (commandPieces.length > 0)) return false;
+  if (!command.parameters) return {};
+  if (command.parameters.length !== commandPieces.length) return false;
+  const params: any = {};
+  command.parameters.forEach((param) => {
+    if (!param.type || param.type === 'string') {
+      params[param.label] = commandPieces.shift();
+      return false;
+    }
 
-        if (param.type === "number") {
-            params[param.label] = Number(commandPieces.shift());
-            return;
-        }
+    if (param.type === 'number') {
+      params[param.label] = Number(commandPieces.shift());
+      return false;
+    }
 
-        params[param.label] = Boolean(commandPieces.shift());
-    });
-    return params;
+    params[param.label] = Boolean(commandPieces.shift());
+  });
+  return params;
 }

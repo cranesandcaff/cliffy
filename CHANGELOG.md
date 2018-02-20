@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.1.0]
+
+### Changed
+
+- `CLI.command` deprecated, use `CLI.addCommand`
+- `Command.action` removed last param ("done")
+
+### Add
+- `setDelimiter`, `addCommand`, `command`, `show`, `hide` return CLI instance
+- `getDelimiter`, `removeCommand`, `addExitCommand`, `getCommandsCount` methods
+
 ## [1.0.6]
 
 ### Added
